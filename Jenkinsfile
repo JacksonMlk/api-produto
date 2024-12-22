@@ -6,19 +6,18 @@ pipeline {
             steps {
                 script {
                     dockerapp = docker.build("fabricionoveronez/api-produto:${env.BUILD_ID}", '-f ./src/Dockerfile ./src')
-
                 }
             }
         }
         stage ('Push image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub')
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         dockerapp.push('latest')
-                        dockerapp.push('${env.BUILD_ID}')
+                        dockerapp.push("${env.BUILD_ID}")  // Aqui, use a interpolação de string
+                    }
                 }
             }
         }
-        
     }
 }
