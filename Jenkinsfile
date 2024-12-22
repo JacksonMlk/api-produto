@@ -14,15 +14,19 @@ pipeline {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                         dockerapp.push('latest')
-                        dockerapp.push("${env.BUILD_ID}")  // Aqui, use a interpolação de string
+                        dockerapp.push("${env.BUILD_ID}")
                     }
                 }
             }
         }
         stage ('Deploy Kubernetes') {
             steps {
-                withKubeConfig([credentialsId: 'kubeconfig'])
+                script {
+                    // Configura o kubeconfig para minikube
+                    sh 'kubectl config use-context minikube'
+                    // Aplica o deployment no Minikube
                     sh 'kubectl apply -f ./k8s/deployment.yaml'
+                }
             }
         }
     }
